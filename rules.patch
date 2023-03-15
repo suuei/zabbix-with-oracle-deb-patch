@@ -41,12 +41,10 @@
  endef
  
 +configure_with_oracle:
-+	$(call configure_with,oracle,--enable-server --enable-proxy --with-oracle-include=/ORACLE_PATH/sdk/include 
---with-oracle-lib=/ORACLE_PATH)
++	$(call configure_with,oracle,--enable-server --enable-proxy --with-oracle-include=/ORACLE_PATH/sdk/include --with-oracle-lib=/ORACLE_PATH)
 +
  configure_with_sqlite3:
- 	$(call configure_with,sqlite3,--enable-agent --with-libmodbus --enable-agent2 --enable-webservice --enable-java 
---enable-proxy)
+ 	$(call configure_with,sqlite3,--enable-agent --with-libmodbus --enable-agent2 --enable-webservice --enable-java --enable-proxy)
  
 @@ -187,7 +196,7 @@
  # build
