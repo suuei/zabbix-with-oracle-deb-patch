@@ -1,0 +1,96 @@
+--- rules	2023-03-03 14:35:33.000000000 +0000
++++ rules.new	2023-03-13 13:30:43.227398368 +0000
+@@ -3,6 +3,9 @@
+ %:
+ 	dh $@
+ 
++override_dh_shlibdeps:
++	dh_shlibdeps --dpkg-shlibdeps-params=--ignore-missing-info
++
+ override_dh_builddeb:
+ 	dh_builddeb -- -Zxz
+ 
+@@ -107,6 +110,8 @@
+ installinit_server:
+ 	dh_installinit --no-start -p zabbix-server-mysql --name=zabbix-server
+ 	dh_installinit --no-start -p zabbix-server-pgsql --name=zabbix-server
++	dh_installinit --no-start -p zabbix-server-oracle --name=zabbix-server
++
+ 
+ clean_server: run_dh_clean
+ 	rm -f debian/conf/zabbix_server.conf
+@@ -126,6 +131,7 @@
+ 	dh_installinit --no-start -p zabbix-proxy-mysql --name=zabbix-proxy
+ 	dh_installinit --no-start -p zabbix-proxy-pgsql --name=zabbix-proxy
+ 	dh_installinit --no-start -p zabbix-proxy-sqlite3 --name=zabbix-proxy
++	dh_installinit --no-start -p zabbix-proxy-oracle --name=zabbix-proxy
+ 
+ clean_proxy: run_dh_clean
+ 	rm -f debian/conf/zabbix_proxy.conf
+@@ -161,7 +167,7 @@
+ # configure
+ #
+ 
+-override_dh_auto_configure: configure_with_sqlite3 configure_with_pgsql configure_with_mysql
++override_dh_auto_configure: configure_with_oracle configure_with_sqlite3 configure_with_pgsql configure_with_mysql
+ 
+ define configure_with
+ 	mkdir -p $(CURDIR)/debian/tmp.build-$(1)
+@@ -174,6 +180,9 @@
+ 	dh_auto_configure --sourcedirectory=$(CURDIR)/debian/tmp.build-$(1) -- $(BUILD_FLAGS) $(2) --with-$(1)
+ endef
+ 
++configure_with_oracle:
++	$(call configure_with,oracle,--enable-server --enable-proxy --with-oracle-include=/ORACLE_PATH/sdk/include 
+--with-oracle-lib=/ORACLE_PATH)
++
+ configure_with_sqlite3:
+ 	$(call configure_with,sqlite3,--enable-agent --with-libmodbus --enable-agent2 --enable-webservice --enable-java 
+--enable-proxy)
+ 
+@@ -187,7 +196,7 @@
+ # build
+ #
+ 
+-override_dh_auto_build: $(BUILD_TARGETS) build_with_sqlite build_with_pgsql build_with_mysql
++override_dh_auto_build: $(BUILD_TARGETS) build_with_oracle build_with_sqlite build_with_pgsql build_with_mysql
+ 
+ define build_with
+ 	cd $(CURDIR)/debian/tmp.build-$(1) && make \
+@@ -196,6 +205,9 @@
+ 	&& cd -
+ endef
+ 
++build_with_oracle:
++	$(call build_with,oracle)
++
+ build_with_sqlite:
+ 	$(call build_with,sqlite3)
+ 
+@@ -223,6 +235,8 @@
+ 	gzip debian/zabbix-server-mysql/usr/share/man/man8/zabbix_server.8 && \
+ 	gzip debian/zabbix-server-pgsql/usr/share/doc/zabbix-server-pgsql/changelog.Debian && \
+ 	gzip debian/zabbix-server-pgsql/usr/share/man/man8/zabbix_server.8 && \
++	gzip debian/zabbix-server-oracle/usr/share/doc/zabbix-server-oracle/changelog.Debian && \
++	gzip debian/zabbix-server-oracle/usr/share/man/man8/zabbix_server.8 && \
+ 	gzip debian/zabbix-js/usr/share/doc/zabbix-js/changelog.Debian && \
+ 	gzip debian/zabbix-frontend-php/usr/share/doc/zabbix-frontend-php/changelog.Debian && \
+ 	gzip debian/zabbix-apache-conf/usr/share/doc/zabbix-apache-conf/changelog.Debian && \
+@@ -233,6 +247,8 @@
+ 	gzip debian/zabbix-proxy-pgsql/usr/share/man/man8/zabbix_proxy.8 && \
+ 	gzip debian/zabbix-proxy-sqlite3/usr/share/doc/zabbix-proxy-sqlite3/changelog.Debian && \
+ 	gzip debian/zabbix-proxy-sqlite3/usr/share/man/man8/zabbix_proxy.8 && \
++	gzip debian/zabbix-proxy-oracle/usr/share/doc/zabbix-proxy-oracle/changelog.Debian && \
++	gzip debian/zabbix-proxy-oracle/usr/share/man/man8/zabbix_proxy.8 && \
+ 	gzip debian/zabbix-java-gateway/usr/share/doc/zabbix-java-gateway/changelog.Debian && \
+ 	gzip debian/zabbix-web-service/usr/share/doc/zabbix-web-service/changelog.Debian && \
+ 	gzip debian/zabbix-web-service/usr/share/man/man8/zabbix_web_service.8 && \
+@@ -250,6 +266,8 @@
+ 	dh_fixperms
+ 	chmod 600 debian/zabbix-server-mysql/etc/zabbix/zabbix_server.conf
+ 	chmod 600 debian/zabbix-server-pgsql/etc/zabbix/zabbix_server.conf
++	chmod 600 debian/zabbix-server-oracle/etc/zabbix/zabbix_server.conf
+ 	chmod 600 debian/zabbix-proxy-mysql/etc/zabbix/zabbix_proxy.conf
+ 	chmod 600 debian/zabbix-proxy-pgsql/etc/zabbix/zabbix_proxy.conf
++	chmod 600 debian/zabbix-proxy-oracle/etc/zabbix/zabbix_proxy.conf
+ 
