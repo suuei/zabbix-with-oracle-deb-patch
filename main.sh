@@ -22,7 +22,7 @@ cat <<EOF >> ${SRCDIR}/debian/control
 
 Package: zabbix-server-oracle
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, fping, adduser, lsb-base
+Depends: \${shlibs:Depends}, \${misc:Depends}, fping, adduser, lsb-base
 Pre-Depends: debconf
 Recommends: snmpd
 Suggests: zabbix-frontend-php, logrotate
@@ -39,7 +39,7 @@ Description: Zabbix network monitoring solution - server (Oracle)
 
 Package: zabbix-proxy-oracle
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, fping, adduser, lsb-base
+Depends: \${shlibs:Depends}, \${misc:Depends}, fping, adduser, lsb-base
 Suggests: logrotate
 Conflicts: zabbix-proxy-mysql, zabbix-proxy-pgsql, zabbix-proxy-sqlite3
 Description: Zabbix network monitoring solution - proxy (Oracle)
